@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dog Breeds</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(135deg, #f4f4f9 0%, #e0e7ff 100%);
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+      }
+      h1 {
+        font-size: 2.5rem;
+        margin: 40px 0 10px 0;
+        color: #2d3748;
+        letter-spacing: 2px;
+        text-shadow: 0 2px 8px #e0e7ff;
+      }
+      .container {
+        width: 100%;
+        max-width: 1100px;
+        background: #fff;
+        padding: 32px 28px 28px 28px;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(60, 72, 88, 0.15);
+        margin-bottom: 40px;
+        margin-top: 20px;
+      }
+      h2 {
+        color: #4f46e5;
+        margin-top: 0;
+        margin-bottom: 18px;
+        font-size: 1.4rem;
+        border-bottom: 1px solid #e0e7ff;
+        padding-bottom: 6px;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+        margin-bottom: 24px;
+        columns: 4;
+        column-gap: 30px;
+      }
+      ul li {
+        margin: 6px 0;
+        color: #6366f1;
+        font-weight: 500;
+        font-size: 1rem;
+        transition: color 0.2s;
+      }
+      ul li:hover {
+        color: #1e293b;
+        text-decoration: underline;
+      }
+      button {
+        padding: 12px 22px;
+        background: linear-gradient(90deg, #6366f1 0%, #60a5fa 100%);
+        color: #fff;
+        border: none;
+        border-radius: 7px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-top: 10px;
+        margin-bottom: 18px;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
+        transition: background 0.2s, transform 0.2s;
+      }
+      button:hover {
+        background: linear-gradient(90deg, #4f46e5 0%, #2563eb 100%);
+        transform: translateY(-2px) scale(1.04);
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      input[type="text"] {
+        padding: 10px 12px;
+        border: 1px solid #c7d2fe;
+        border-radius: 6px;
+        font-size: 1rem;
+        outline: none;
+        transition: border 0.2s;
+        width: 100%;
+        max-width: 250px;
+      }
+      input[type="text"]:focus {
+        border: 1.5px solid #6366f1;
+        background: #f0f7ff;
+      }
+      img {
+        max-width: 100%;
+        margin-top: 12px;
+        width: 320px;
+        height: 320px;
+        object-fit: cover;
+        border-radius: 14px;
+        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1);
+        border: 2px solid #e0e7ff;
+        background: #f4f4f9;
+        display: block;
+      }
+      @media (max-width: 700px) {
+        .container {
+          max-width: 95vw;
+          padding: 18px 6vw;
+        }
+        img {
+          width: 90vw;
+          height: 50vw;
+          min-height: 180px;
+        }
+        ul {
+          columns: 1;
+        }
+      }
+    </style>
+    <script>
+      async function getRandomImage() {
+        try {
+          const response = await fetch("/random", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
+          const data = await response.json();
+          if (data.randomImage) {
+            document.getElementById("random-image").src = data.randomImage;
+          } else {
+            alert("Failed to fetch image.");
+          }
+        } catch {
+          alert("An error occurred.");
+        }
+      }
+
+      async function getBreedImages(event) {
+        event.preventDefault();
+        const breed = event.target.breed.value;
+        try {
+          const res = await fetch("/byBreed", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ breed }),
+          });
+          const imgUrl = await res.json();
+          document.getElementById("random-breed-image").src = imgUrl.breedImage;
+        } catch {
+          alert("An error occurred.");
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Dog Breeds</h1>
+    <div class="container">
+      <h2>Available Breeds</h2>
+      <ul>
+        <% for(let breed in breeds) { %>
+        <li><%= breed %></li>
+        <% } %>
+      </ul>
+
+      <h2>Random Dog Image</h2>
+      <button onclick="getRandomImage()" type="button">Get Random Image</button>
+      <img id="random-image" src="" alt="Random Dog Image" />
+
+      <h2>Search for Breed Image</h2>
+      <form onsubmit="getBreedImages(event)">
+        <input
+          type="text"
+          name="breed"
+          placeholder="Enter breed name"
+          required
+        />
+        <button type="submit">Get Images</button>
+        <img id="random-breed-image" src="" alt="Random Image of the breed" />
+      </form>
+    </div>
+  </body>
+</html>
